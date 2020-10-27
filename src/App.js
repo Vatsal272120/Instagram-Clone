@@ -7,8 +7,17 @@ import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Avatar } from "@material-ui/core";
 import Post from "./Components/Post";
+import { db, auth } from "./firebase";
 
 function App() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    db.collection("posts").onSnapshot((snapshot) =>
+      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
+    );
+  }, []);
+
   return (
     <div className='app'>
       {/* Header */}
@@ -43,7 +52,16 @@ function App() {
       </div>
 
       {/* Posts X n */}
-      <Post />
+
+      {posts.map(({ post, id }) => (
+        <Post
+          key={id}
+          username={post.username}
+          imageUrl={post.imageUrl}
+          profilePic={post.profilePic}
+          caption={post.caption}
+        />
+      ))}
     </div>
   );
 }
